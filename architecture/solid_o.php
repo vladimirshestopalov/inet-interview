@@ -1,26 +1,45 @@
 <?php
+interface Nameable {
+    public function getObjectName();
+}
 
-class SomeObject {
+abstract class Obj implements Nameable{
     protected $name;
 
-    public function __construct(string $name) { }
+    public function __construct(string $name) {
+        $this->name=$name;
+    }
 
-    public function getObjectName() { }
+    public function getObjectName() {
+        return $this->name;
+    }
+}
+
+class SomeObject extends Obj{}
+
+class handlerFactory {
+    public function create(Nameable $object)
+    {
+            if ($object->getObjectName() == 'object_1')
+                return 'handle_object_1';
+            if ($object->getObjectName() == 'object_2')
+                return 'handle_object_2';
+    }
 }
 
 class SomeObjectsHandler {
-    public function __construct() { }
 
+    private $handlers;
+
+    public function __construct() {
+        $this->handlers=[];
+    }
     public function handleObjects(array $objects): array {
-        $handlers = [];
         foreach ($objects as $object) {
-            if ($object->getObjectName() == 'object_1')
-                $handlers[] = 'handle_object_1';
-            if ($object->getObjectName() == 'object_2')
-                $handlers[] = 'handle_object_2';
+            $hf=new handlerFactory();
+            $this->handlers[]=$hf->create($object);
         }
-
-        return $handlers;
+        return $this->handlers;
     }
 }
 
